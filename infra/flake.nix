@@ -10,6 +10,7 @@
         in {
           default = pkgs.mkShell {
             buildInputs = [ pkgs.kubectl pkgs.terraform pkgs.k9s pkgs.gh ];
+            shellHook = ''if [ -t 0 ]; then exec fish; fi'';
           };
         });
     };

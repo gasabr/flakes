@@ -32,7 +32,6 @@
               pkgs.ruff
               pkgs.lazygit
               pkgs.git
-              pkgs.fish
               pkgs.postgresql
               pkgs.claude-code
               pkgs.ripgrep

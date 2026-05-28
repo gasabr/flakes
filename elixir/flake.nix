@@ -13,6 +13,7 @@
         in {
           default = pkgs.mkShell {
             buildInputs = [ beamPkgs.elixir beamPkgs.elixir-ls pkgs.postgresql ];
+            shellHook = ''if [ -t 0 ]; then exec fish; fi'';
           };
         });
     };

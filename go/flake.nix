@@ -11,6 +11,7 @@
         in {
           default = pkgs.mkShell {
             buildInputs = [ pkgs.go pkgs.gopls ];
+            shellHook = ''if [ -t 0 ]; then exec fish; fi'';
           };
         });
     };

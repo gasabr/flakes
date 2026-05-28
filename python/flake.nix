@@ -20,6 +20,7 @@
               export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath runtimeLibs}:$LD_LIBRARY_PATH"
               export JAVA_HOME="${pkgs.openjdk17_headless.home}"
               export SPARK_HOME="${pkgs.spark}"
+              if [ -t 0 ]; then exec fish; fi
             '';
           };
         });

@@ -1,4 +1,4 @@
-# ts/flake.nix
+# claude/flake.nix
 {
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.11-darwin";
   outputs = { self, nixpkgs }:
@@ -10,7 +10,15 @@
         let pkgs = nixpkgs.legacyPackages.${system};
         in {
           default = pkgs.mkShell {
-            buildInputs = [ pkgs.nodejs pkgs.nodePackages.typescript-language-server ];
+            buildInputs = [
+              pkgs.claude-code
+              # LSPs matching nvim setup
+              pkgs.pyright
+              pkgs.ruff
+              pkgs.typescript-language-server
+              pkgs.elixir-ls
+              pkgs.gopls
+            ];
             shellHook = ''if [ -t 0 ]; then exec fish; fi'';
           };
         });
