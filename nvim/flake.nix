@@ -71,7 +71,7 @@
                 lua << EOF
                 vim.filetype.add({ extension = { Dockerfile = "dockerfile", Containerfile = "dockerfile", heex = "heex", eex = "eex", leex = "leex" } })
                 vim.diagnostic.config({
-                  float = { border = "rounded", source = "always", wrap_at = 50 },
+                  float = { border = "rounded", source = "always", focusable = true },
                   virtual_text = {
                     prefix = '■', spacing = 4,
                     format = function(d)
@@ -136,6 +136,7 @@
                 vim.keymap.set('n', '<M-t>', ':NERDTreeFind<CR>', { silent = true, desc = "Find current file in NERDTree" })
                 vim.keymap.set('n', '<C-p>', '<cmd>Telescope find_files<CR>', { silent = true, desc = "Find files" })
                 vim.keymap.set('n', '<leader>-', '<cmd>Telescope lsp_document_symbols<CR>', { silent = true, desc = "Structure view" })
+                vim.keymap.set('n', '<leader>gs', '<cmd>Telescope lsp_dynamic_workspace_symbols<CR>', { silent = true, desc = "Go to symbol in workspace" })
                 vim.keymap.set('n', '<leader>fg', '<cmd>Telescope live_grep<CR>', { silent = true, desc = "Live grep" })
                 vim.keymap.set('n', '<leader>fb', '<cmd>Telescope buffers<CR>', { silent = true, desc = "Buffers" })
                 vim.keymap.set('n', '<leader>fh', '<cmd>Telescope help_tags<CR>', { silent = true, desc = "Help tags" })
@@ -146,6 +147,8 @@
                 vim.keymap.set('n', '<leader>ft', '<cmd>Telescope git_status<CR>', { silent = true, desc = "Git status" })
                 vim.keymap.set('n', '<D-/>', 'gcc', { remap = true }) ; vim.keymap.set('v', '<D-/>', 'gc', { remap = true })
                 vim.keymap.set('n', '<C-/>', 'gcc', { remap = true }) ; vim.keymap.set('v', '<C-/>', 'gc', { remap = true })
+                vim.keymap.set('n', ']d', function() vim.diagnostic.goto_next() ; vim.schedule(function() vim.diagnostic.open_float() end) end, opts)
+                vim.keymap.set('n', '[d', function() vim.diagnostic.goto_prev() ; vim.schedule(function() vim.diagnostic.open_float() end) end, opts)
 EOF
               '';
               packages.myVimPackage.start = with pkgs.vimPlugins; [
