@@ -145,6 +145,7 @@
                 vim.keymap.set('n', '<leader>fd', '<cmd>Telescope diagnostics<CR>', { silent = true, desc = "Diagnostics" })
                 vim.keymap.set('n', '<leader>fc', '<cmd>Telescope git_commits<CR>', { silent = true, desc = "Git commits" })
                 vim.keymap.set('n', '<leader>ft', '<cmd>Telescope git_status<CR>', { silent = true, desc = "Git status" })
+                vim.keymap.set('n', '<leader>fm', '<cmd>Telescope marks<CR>', { silent = true, desc = "Show marks" })
                 vim.keymap.set('n', '<D-/>', 'gcc', { remap = true }) ; vim.keymap.set('v', '<D-/>', 'gc', { remap = true })
                 vim.keymap.set('n', '<C-/>', 'gcc', { remap = true }) ; vim.keymap.set('v', '<C-/>', 'gc', { remap = true })
                 vim.keymap.set('n', ']d', function() vim.diagnostic.goto_next() ; vim.schedule(function() vim.diagnostic.open_float() end) end, opts)
