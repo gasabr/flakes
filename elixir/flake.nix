@@ -1,4 +1,3 @@
-# elixir/flake.nix
 {
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.11-darwin";
   outputs = { self, nixpkgs }:
@@ -12,10 +11,11 @@
           beamPkgs = pkgs.beam.packagesWith pkgs.erlang_27;
         in {
           default = pkgs.mkShell {
-            WALLABY_CHROMEDRIVER_PATH = "${pkgs.chromedriver}/bin/chromedriver";
-            WALLABY_CHROME_BINARY = "${pkgs.google-chrome}/bin/google-chrome";
             buildInputs = [ beamPkgs.elixir beamPkgs.elixir-ls pkgs.chromedriver pkgs.google-chrome ];
-            shellHook = ''if [ -t 0 ]; then exec fish; fi'';
+            shellHook = ''
+              export WALLABY_CHROMEDRIVER_PATH="${pkgs.chromedriver}/bin/chromedriver"
+              export WALLABY_CHROME_BINARY="${pkgs.google-chrome}/bin/google-chrome-stable"
+            '';
           };
         });
     };
