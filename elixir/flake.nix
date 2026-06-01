@@ -8,11 +8,13 @@
     in {
       devShells = forAllSystems (system:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
+          pkgs = import nixpkgs { inherit system; config.allowUnfree = true; };
           beamPkgs = pkgs.beam.packagesWith pkgs.erlang_27;
         in {
           default = pkgs.mkShell {
-            buildInputs = [ beamPkgs.elixir beamPkgs.elixir-ls pkgs.postgresql ];
+            WALLABY_CHROMEDRIVER_PATH = "${pkgs.chromedriver}/bin/chromedriver";
+            WALLABY_CHROME_BINARY = "${pkgs.google-chrome}/bin/google-chrome";
+            buildInputs = [ beamPkgs.elixir beamPkgs.elixir-ls pkgs.chromedriver pkgs.google-chrome ];
             shellHook = ''if [ -t 0 ]; then exec fish; fi'';
           };
         });
