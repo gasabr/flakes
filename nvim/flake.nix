@@ -130,6 +130,11 @@
                 vim.api.nvim_create_autocmd("FileType", { pattern = { "heex", "eex", "leex" }, callback = function(args) pcall(vim.treesitter.start, args.buf) end })
                 vim.o.foldmethod = 'expr' ; vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()' ; vim.o.foldlevelstart = 99 ; vim.o.foldtext = ""
                 local ok_comment, comment = pcall(require, 'Comment') ; if ok_comment then comment.setup() end
+                local ok_hop, hop = pcall(require, 'hop')
+                if ok_hop then
+                  hop.setup({ keys = 'etovxqpdygfblzhckisuran' })
+                  vim.keymap.set('n', '<leader>;', function() hop.hint_char1() end, { desc = "Hop to char" })
+                end
                 local ok_tel, telescope = pcall(require, 'telescope')
                 if ok_tel then
                   local actions = require('telescope.actions')
@@ -170,7 +175,7 @@
 EOF
               '';
               packages.myVimPackage.start = with pkgs.vimPlugins; [
-                vim-elixir vim-nix vim-hybrid vim-airline vim-airline-themes vim-fugitive tagbar nvim-lspconfig nvim-cmp cmp-nvim-lsp cmp-buffer nerdtree telescope-nvim plenary-nvim telescope-fzf-native-nvim comment-nvim
+                vim-elixir vim-nix vim-hybrid vim-airline vim-airline-themes vim-fugitive tagbar nvim-lspconfig nvim-cmp cmp-nvim-lsp cmp-buffer nerdtree telescope-nvim plenary-nvim telescope-fzf-native-nvim comment-nvim hop-nvim
                 (nvim-treesitter.withPlugins (p: [ p.html p.css p.javascript p.typescript p.tsx p.python p.nix p.yaml p.dockerfile p.json p.toml p.sql p.elixir p.heex p.eex p.go p.gomod p.gosum ]))
               ];
             };
