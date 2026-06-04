@@ -1,4 +1,3 @@
-# go/flake.nix
 {
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.11-darwin";
   outputs = { self, nixpkgs }:
@@ -10,7 +9,7 @@
         let pkgs = nixpkgs.legacyPackages.${system};
         in {
           default = pkgs.mkShell {
-            buildInputs = [ pkgs.git pkgs.jq pkgs.lazygit pkgs.ripgrep pkgs.k9s pkgs.kubectl pkgs.doctl ];
+            buildInputs = [ pkgs.git pkgs.jq pkgs.lazygit pkgs.ripgrep pkgs.k9s pkgs.kubectl pkgs.doctl pkgs.cursor-cli pkgs.github-cli ];
             shellHook = ''if [[ $- == *i* ]]; then exec fish; fi'';
           };
         });
