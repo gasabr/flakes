@@ -11,11 +11,9 @@
           beamPkgs = pkgs.beam.packagesWith pkgs.erlang_27;
         in {
           default = pkgs.mkShell {
+            WALLABY_CHROMEDRIVER_PATH = "${pkgs.chromedriver}/bin/chromedriver";
+            WALLABY_CHROME_BINARY = "${pkgs.google-chrome}/bin/google-chrome-stable";
             buildInputs = [ beamPkgs.elixir beamPkgs.elixir-ls pkgs.chromedriver pkgs.google-chrome ];
-            shellHook = ''
-              export WALLABY_CHROMEDRIVER_PATH="${pkgs.chromedriver}/bin/chromedriver"
-              export WALLABY_CHROME_BINARY="${pkgs.google-chrome}/bin/google-chrome-stable"
-            '';
           };
         });
     };

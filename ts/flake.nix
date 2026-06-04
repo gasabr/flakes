@@ -11,7 +11,7 @@
         in {
           default = pkgs.mkShell {
             buildInputs = [ pkgs.nodejs pkgs.nodePackages.typescript-language-server ];
-            shellHook = ''if [ -t 0 ]; then exec fish; fi'';
+            shellHook = ''if [[ $- == *i* ]]; then exec fish; fi'';
           };
         });
     };

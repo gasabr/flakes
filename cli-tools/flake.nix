@@ -10,8 +10,8 @@
         let pkgs = nixpkgs.legacyPackages.${system};
         in {
           default = pkgs.mkShell {
-            buildInputs = [ pkgs.git pkgs.jq pkgs.lazygit ];
-            shellHook = ''if [ -t 0 ]; then exec fish; fi'';
+            buildInputs = [ pkgs.git pkgs.jq pkgs.lazygit pkgs.ripgrep pkgs.k9s pkgs.kubectl pkgs.doctl ];
+            shellHook = ''if [[ $- == *i* ]]; then exec fish; fi'';
           };
         });
     };
