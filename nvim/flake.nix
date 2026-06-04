@@ -144,7 +144,33 @@
                       sorting_strategy = 'ascending', file_ignore_patterns = { "^%.git/", "node_modules/", "%.venv/", "__pycache__/", "%.pytest_cache/", "_build/", "deps/" },
                       mappings = { i = { ["<C-n>"] = actions.move_selection_next, ["<C-p>"] = actions.move_selection_previous, ["<Esc>"] = actions.close } },
                     },
-                    pickers = { find_files = { hidden = true } },
+                    pickers = {
+                      find_files = { hidden = true },
+                      lsp_document_symbols = {
+                        entry_maker = (function()
+                          local make_entry = require('telescope.make_entry')
+                          return function(entry)
+                            local base = make_entry.gen_from_lsp_symbols({})(entry)
+                            if not base then return nil end
+                            base.display = function(e)
+                              local name = e.symbol_name or ""
+                              local kind = (e.symbol_type or ""):lower()
+                              local width = vim.o.columns
+                              for _, win in ipairs(vim.api.nvim_list_wins()) do
+                                if vim.bo[vim.api.nvim_win_get_buf(win)].filetype == "TelescopeResults" then
+                                  width = vim.api.nvim_win_get_width(win) - 4
+                                  break
+                                end
+                              end
+                              local pad = math.max(1, width - #name - #kind)
+                              return name .. string.rep(" ", pad) .. kind,
+                                { { { #name + pad, #name + pad + #kind }, "Comment" } }
+                            end
+                            return base
+                          end
+                        end)(),
+                      },
+                    },
                   })
                   pcall(telescope.load_extension, 'fzf')
                 end
