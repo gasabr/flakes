@@ -19,7 +19,7 @@
                 colorscheme hybrid
                 autocmd FileType python setlocal foldmethod=indent foldlevel=99
                 autocmd FileType typescript,typescriptreact,javascript,javascriptreact setlocal tabstop=2 shiftwidth=2
-                let g:airline_section_b = '%{FugitiveHead()}'
+                let g:airline_section_b = '%{FugitiveHead()}%{empty(get(g:, "gh_pr_status", "")) ? "" : " " . g:gh_pr_status}'
                 let g:airline_section_c = ""
                 let g:airline_section_y = '%{tagbar#currenttag("%s", "", "f")}'
                 let g:airline_section_z = '%l:%c'
@@ -174,6 +174,27 @@
                   })
                   pcall(telescope.load_extension, 'fzf')
                 end
+                vim.g.gh_pr_status = ""
+                local _gh_pr_cache = {}
+                local function _refresh_gh_pr()
+                  local branch = vim.fn.FugitiveHead()
+                  if branch == "" then vim.g.gh_pr_status = "" ; return end
+                  if _gh_pr_cache[branch] ~= nil then vim.g.gh_pr_status = _gh_pr_cache[branch] ; return end
+                  _gh_pr_cache[branch] = ""
+                  vim.fn.jobstart("gh pr view --json number --jq '.number' 2>/dev/null", {
+                    stdout_buffered = true,
+                    on_stdout = function(_, data)
+                      if data and data[1] and data[1] ~= "" then
+                        local num = data[1]:match("^%s*(%d+)%s*$")
+                        if num then _gh_pr_cache[branch] = "#" .. num ; vim.g.gh_pr_status = _gh_pr_cache[branch] end
+                      end
+                    end,
+                  })
+                end
+                vim.api.nvim_create_autocmd("BufEnter", { callback = _refresh_gh_pr })
+                vim.api.nvim_create_autocmd("FocusGained", { callback = function()
+                  local b = vim.fn.FugitiveHead() ; if b ~= "" then _gh_pr_cache[b] = nil end ; _refresh_gh_pr()
+                end })
                 local opts = { noremap=true, silent=true }
                 vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
                 vim.keymap.set('n', 'gr', '<cmd>Telescope lsp_references<CR>', opts)
@@ -198,6 +219,10 @@
                 vim.keymap.set('n', '<leader>fc', '<cmd>Telescope git_commits<CR>', { silent = true, desc = "Git commits" })
                 vim.keymap.set('n', '<leader>ft', '<cmd>Telescope git_status<CR>', { silent = true, desc = "Git status" })
                 vim.keymap.set('n', '<leader>fm', '<cmd>Telescope marks<CR>', { silent = true, desc = "Show marks" })
+                vim.keymap.set('n', '<leader>gP', function()
+                  local b = vim.fn.FugitiveHead() ; if b ~= "" then _gh_pr_cache[b] = nil end
+                  _refresh_gh_pr() ; vim.fn.jobstart("gh pr view --web 2>/dev/null")
+                end, { silent = true, desc = "Open PR in browser" })
                 vim.keymap.set('n', '<D-/>', 'gcc', { remap = true }) ; vim.keymap.set('v', '<D-/>', 'gc', { remap = true })
                 vim.keymap.set('n', '<C-/>', 'gcc', { remap = true }) ; vim.keymap.set('v', '<C-/>', 'gc', { remap = true })
                 vim.keymap.set('n', ']d', function() vim.diagnostic.goto_next() ; vim.schedule(function() vim.diagnostic.open_float() end) end, opts)
