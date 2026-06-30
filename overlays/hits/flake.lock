@@ -1,0 +1,123 @@
+{
+  "nodes": {
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1781214844,
+        "narHash": "sha256-GiKi1nonuwTHG1mTrwFTllfMSN2rvHQZUgpW0nQX/qM=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "9bc9b4b4e7b1e7ce7ec2a8355b4369541b90cd6a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-25.11-darwin",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1781214844,
+        "narHash": "sha256-GiKi1nonuwTHG1mTrwFTllfMSN2rvHQZUgpW0nQX/qM=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "9bc9b4b4e7b1e7ce7ec2a8355b4369541b90cd6a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-25.11-darwin",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_3": {
+      "locked": {
+        "lastModified": 1781214844,
+        "narHash": "sha256-GiKi1nonuwTHG1mTrwFTllfMSN2rvHQZUgpW0nQX/qM=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "9bc9b4b4e7b1e7ce7ec2a8355b4369541b90cd6a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-25.11-darwin",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_4": {
+      "locked": {
+        "lastModified": 1781214844,
+        "narHash": "sha256-GiKi1nonuwTHG1mTrwFTllfMSN2rvHQZUgpW0nQX/qM=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "9bc9b4b4e7b1e7ce7ec2a8355b4369541b90cd6a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-25.11-darwin",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nvim": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_2"
+      },
+      "locked": {
+        "lastModified": 1780612051,
+        "narHash": "sha256-l0o8F1yAX78nehtcCI2yqSag+rp8+DalqzgRIGGgCno=",
+        "path": "/Users/glebabroskin/Projects/flakes/nvim",
+        "type": "path"
+      },
+      "original": {
+        "path": "/Users/glebabroskin/Projects/flakes/nvim",
+        "type": "path"
+      }
+    },
+    "python": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_3"
+      },
+      "locked": {
+        "lastModified": 1779987097,
+        "narHash": "sha256-sezeIF68h0fXHRaan/ncqwIGFKKvRdQLNHpU6D1BsWE=",
+        "path": "/Users/glebabroskin/Projects/flakes/spark",
+        "type": "path"
+      },
+      "original": {
+        "path": "/Users/glebabroskin/Projects/flakes/spark",
+        "type": "path"
+      }
+    },
+    "root": {
+      "inputs": {
+        "nixpkgs": "nixpkgs",
+        "nvim": "nvim",
+        "python": "python",
+        "tools": "tools"
+      }
+    },
+    "tools": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_4"
+      },
+      "locked": {
+        "lastModified": 1781202954,
+        "narHash": "sha256-IInjZ9nnbLRBl6jyjG8DHjo/Js2n0t1b88W5sTja1vg=",
+        "path": "/Users/glebabroskin/Projects/flakes/cli-tools",
+        "type": "path"
+      },
+      "original": {
+        "path": "/Users/glebabroskin/Projects/flakes/cli-tools",
+        "type": "path"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
