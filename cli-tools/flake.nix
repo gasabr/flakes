@@ -9,7 +9,7 @@
         let pkgs = nixpkgs.legacyPackages.${system};
         in {
           default = pkgs.mkShell {
-            buildInputs = [ pkgs.git pkgs.jq pkgs.lazygit pkgs.ripgrep pkgs.k9s pkgs.kubectl pkgs.doctl pkgs.cursor-cli pkgs.github-cli ];
+            buildInputs = [ pkgs.git pkgs.jq pkgs.lazygit pkgs.ripgrep pkgs.k9s pkgs.kubectl pkgs.doctl pkgs.cursor-cli pkgs.github-cli pkgs.clickhouse ];
             shellHook = ''if [[ $- == *i* ]]; then exec fish; fi'';
           };
         });

@@ -130,6 +130,18 @@
                 vim.api.nvim_create_autocmd("FileType", { pattern = { "heex", "eex", "leex" }, callback = function(args) pcall(vim.treesitter.start, args.buf) end })
                 vim.o.foldmethod = 'expr' ; vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()' ; vim.o.foldlevelstart = 99 ; vim.o.foldtext = ""
                 local ok_comment, comment = pcall(require, 'Comment') ; if ok_comment then comment.setup() end
+                local ok_gs, gitsigns = pcall(require, 'gitsigns')
+                if ok_gs then
+                  gitsigns.setup()
+                  vim.api.nvim_create_user_command('GitBlame', function()
+                    for _, win in ipairs(vim.api.nvim_list_wins()) do
+                      if vim.bo[vim.api.nvim_win_get_buf(win)].filetype == 'gitsigns-blame' then
+                        vim.api.nvim_win_close(win, true) ; return
+                      end
+                    end
+                    gitsigns.blame()
+                  end, { desc = "Toggle IDEA-style git blame gutter (commit + author on the left)" })
+                end
                 local ok_hop, hop = pcall(require, 'hop')
                 if ok_hop then
                   hop.setup({ keys = 'etovxqpdygfblzhckisuran' })
@@ -230,7 +242,7 @@
 EOF
               '';
               packages.myVimPackage.start = with pkgs.vimPlugins; [
-                vim-elixir vim-nix vim-hybrid vim-airline vim-airline-themes vim-fugitive tagbar nvim-lspconfig nvim-cmp cmp-nvim-lsp cmp-buffer nerdtree telescope-nvim plenary-nvim telescope-fzf-native-nvim comment-nvim hop-nvim
+                vim-elixir vim-nix vim-hybrid vim-airline vim-airline-themes vim-fugitive tagbar nvim-lspconfig nvim-cmp cmp-nvim-lsp cmp-buffer nerdtree telescope-nvim plenary-nvim telescope-fzf-native-nvim comment-nvim hop-nvim gitsigns-nvim
                 (nvim-treesitter.withPlugins (p: [ p.html p.css p.javascript p.typescript p.tsx p.python p.nix p.yaml p.dockerfile p.json p.toml p.sql p.elixir p.heex p.eex p.go p.gomod p.gosum ]))
               ];
             };
