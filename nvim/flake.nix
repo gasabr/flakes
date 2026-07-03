@@ -210,6 +210,7 @@
                 local opts = { noremap=true, silent=true }
                 vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
                 vim.keymap.set('n', 'gr', '<cmd>Telescope lsp_references<CR>', opts)
+                vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
                 vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
                 vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, opts)
                 vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, opts)
