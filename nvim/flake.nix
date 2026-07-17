@@ -21,6 +21,7 @@
                 autocmd FileType typescript,typescriptreact,javascript,javascriptreact setlocal tabstop=2 shiftwidth=2
                 let g:airline_section_b = '%{FugitiveHead()}%{empty(get(g:, "gh_pr_status", "")) ? "" : " " . g:gh_pr_status}'
                 let g:airline_section_c = ""
+                let g:airline_section_x = '%t'
                 let g:airline_section_y = '%{tagbar#currenttag("%s", "", "f")}'
                 let g:airline_section_z = '%l:%c'
                 set background=dark
@@ -47,21 +48,25 @@
                   let a:palette.normal.airline_a = s:N
                   let a:palette.normal.airline_b = s:mid
                   let a:palette.normal.airline_c = s:dark
+                  let a:palette.normal.airline_x = s:mid
                   let a:palette.normal.airline_z = s:N
                   let s:I = ['#1d1f21', '#5f819d', 234, 67]
                   let a:palette.insert.airline_a = s:I
                   let a:palette.insert.airline_b = s:mid
                   let a:palette.insert.airline_c = s:dark
+                  let a:palette.insert.airline_x = s:mid
                   let a:palette.insert.airline_z = s:I
                   let s:V = ['#1d1f21', '#85678f', 234, 96]
                   let a:palette.visual.airline_a = s:V
                   let a:palette.visual.airline_b = s:mid
                   let a:palette.visual.airline_c = s:dark
+                  let a:palette.visual.airline_x = s:mid
                   let a:palette.visual.airline_z = s:V
                   let s:R = ['#1d1f21', '#a54242', 234, 131]
                   let a:palette.replace.airline_a = s:R
                   let a:palette.replace.airline_b = s:mid
                   let a:palette.replace.airline_c = s:dark
+                  let a:palette.replace.airline_x = s:mid
                   let a:palette.replace.airline_z = s:R
                 endfunction
                 nmap <F12> :TagbarToggle<CR>
