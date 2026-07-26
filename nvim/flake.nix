@@ -97,6 +97,7 @@
                 local ok_lsp, _ = pcall(require, 'lspconfig')
                 if ok_lsp then
                   vim.lsp.config.pyright = {} ; vim.lsp.enable("pyright")
+                  vim.lsp.config.clangd = {} ; vim.lsp.enable("clangd")
                   vim.lsp.config.ruff = {} ; vim.lsp.enable("ruff")
                   vim.lsp.config.ts_ls = {} ; vim.lsp.enable("ts_ls")
                   vim.lsp.config.elixirls = { cmd = { "elixir-ls" } } ; vim.lsp.enable("elixirls")
