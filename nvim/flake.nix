@@ -19,6 +19,7 @@
                 colorscheme hybrid
                 autocmd FileType python setlocal foldmethod=indent foldlevel=99
                 autocmd FileType typescript,typescriptreact,javascript,javascriptreact setlocal tabstop=2 shiftwidth=2
+                autocmd FileType swift setlocal tabstop=4 shiftwidth=4
                 let g:airline_section_b = '%{FugitiveHead()}%{empty(get(g:, "gh_pr_status", "")) ? "" : " " . g:gh_pr_status}'
                 let g:airline_section_c = ""
                 let g:airline_section_x = '%t'
@@ -102,6 +103,18 @@
                   vim.lsp.config.ts_ls = {} ; vim.lsp.enable("ts_ls")
                   vim.lsp.config.elixirls = { cmd = { "elixir-ls" } } ; vim.lsp.enable("elixirls")
                   vim.lsp.config.gopls = {} ; vim.lsp.enable("gopls")
+                  -- SourceKit-LSP (Xcode / Swift toolchain). See:
+                  -- https://www.swift.org/documentation/articles/zero-to-swift-nvim.html
+                  vim.lsp.config.sourcekit = {
+                    cmd = { "sourcekit-lsp" },
+                    filetypes = { "swift" },
+                    root_markers = { ".git", "compile_commands.json", ".sourcekit-lsp", "Package.swift" },
+                    capabilities = {
+                      workspace = { didChangeWatchedFiles = { dynamicRegistration = true } },
+                      textDocument = { diagnostic = { dynamicRegistration = true, relatedDocumentSupport = true } },
+                    },
+                  }
+                  vim.lsp.enable("sourcekit")
                 end
                 vim.api.nvim_create_autocmd("BufWritePre", {
                   pattern = "*.py",
@@ -246,11 +259,50 @@
                 vim.keymap.set('n', '<C-/>', 'gcc', { remap = true }) ; vim.keymap.set('v', '<C-/>', 'gc', { remap = true })
                 vim.keymap.set('n', ']d', function() vim.diagnostic.goto_next() ; vim.schedule(function() vim.diagnostic.open_float() end) end, opts)
                 vim.keymap.set('n', '[d', function() vim.diagnostic.goto_prev() ; vim.schedule(function() vim.diagnostic.open_float() end) end, opts)
+                -- Swift DAP via lldb-dap (Swift toolchain / xcrun), from the Swift.org nvim guide
+                local function find_lldb_dap()
+                  local xcrun = vim.system({ "xcrun", "--find", "lldb-dap" }, { text = true }):wait()
+                  if xcrun.code == 0 then
+                    local p = vim.fn.trim(xcrun.stdout)
+                    if vim.fn.executable(p) == 1 then return p end
+                  end
+                  if vim.fn.executable("lldb-dap") == 1 then return "lldb-dap" end
+                  vim.notify("lldb-dap not found (install Xcode / Swift toolchain)", vim.log.levels.WARN)
+                  return ""
+                end
+                local ok_dap, dap = pcall(require, "dap")
+                if ok_dap then
+                  vim.api.nvim_set_hl(0, "DapStopped", { default = true, link = "Visual" })
+                  vim.fn.sign_define("DapStopped", { linehl = "DapStopped" })
+                  dap.adapters["lldb-dap"] = { type = "executable", name = "lldb-dap", command = find_lldb_dap() }
+                  dap.configurations.swift = {
+                    { name = "Launch", type = "lldb-dap", request = "launch", program = function() return require("dap.utils").pick_file({ executables = true }) end, cwd = "''${workspaceFolder}" },
+                    { name = "Launch with arguments", type = "lldb-dap", request = "launch", program = function() return require("dap.utils").pick_file({ executables = true }) end, cwd = "''${workspaceFolder}", args = function() return require("dap.utils").splitstr(vim.fn.input("Arguments: ")) end },
+                    { name = "Attach", type = "lldb-dap", request = "attach", pid = function() return require("dap.utils").pick_process() end },
+                  }
+                  vim.keymap.set('n', '<leader>db', function() dap.toggle_breakpoint() end, { desc = "Toggle Breakpoint" })
+                  vim.keymap.set('n', '<leader>dc', function() dap.continue() end, { desc = "Run/Continue" })
+                  vim.keymap.set('n', '<leader>di', function() dap.step_into() end, { desc = "Step Into" })
+                  vim.keymap.set('n', '<leader>do', function() dap.step_over() end, { desc = "Step Over" })
+                  vim.keymap.set('n', '<leader>dO', function() dap.step_out() end, { desc = "Step Out" })
+                  vim.keymap.set('n', '<leader>dt', function() dap.terminate() end, { desc = "Terminate" })
+                end
+                local ok_dapui, dapui = pcall(require, "dapui")
+                if ok_dapui and ok_dap then
+                  dapui.setup({
+                    icons = { expanded = "▾", collapsed = "▸", current_frame = "►" },
+                    controls = { icons = { pause = "⏸", play = "▶", step_into = "↓", step_over = "→", step_out = "↑", step_back = "←", run_last = "↺", terminate = "□", disconnect = "×" } },
+                  })
+                  dap.listeners.after.event_initialized["dapui_config"] = function() dapui.open({}) end
+                  dap.listeners.before.event_terminated["dapui_config"] = function() dapui.close({}) end
+                  dap.listeners.before.event_exited["dapui_config"] = function() dapui.close({}) end
+                end
 EOF
               '';
               packages.myVimPackage.start = with pkgs.vimPlugins; [
                 vim-elixir vim-nix vim-hybrid vim-airline vim-airline-themes vim-fugitive tagbar nvim-lspconfig nvim-cmp cmp-nvim-lsp cmp-buffer nerdtree telescope-nvim plenary-nvim telescope-fzf-native-nvim comment-nvim hop-nvim gitsigns-nvim
-                (nvim-treesitter.withPlugins (p: [ p.html p.xml p.css p.javascript p.typescript p.tsx p.python p.nix p.yaml p.dockerfile p.json p.toml p.sql p.elixir p.heex p.eex p.go p.gomod p.gosum ]))
+                nvim-dap nvim-dap-ui nvim-nio
+                (nvim-treesitter.withPlugins (p: [ p.html p.xml p.css p.javascript p.typescript p.tsx p.python p.nix p.yaml p.dockerfile p.json p.toml p.sql p.elixir p.heex p.eex p.go p.gomod p.gosum p.swift ]))
               ];
             };
           };
