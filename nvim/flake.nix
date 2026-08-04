@@ -1,5 +1,5 @@
 {
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.11-darwin";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-26.05-darwin";
   outputs = { self, nixpkgs }:
     let
       supportedSystems = [ "aarch64-darwin" "x86_64-linux" "aarch64-linux" ];
