@@ -3,6 +3,16 @@
 Personal Neovim configuration, packaged as a Nix flake (`flake.nix`). This file
 collects handy shortcuts and commands. `<leader>` is the space key (default).
 
+## Swift / SourceKit (Darwin)
+
+On macOS the editor calls `xcrun sourcekit-lsp` (host Xcode toolchain). It does
+**not** put nixpkgs `sourcekit-lsp` on PATH — that binary shadows Apple’s shim and
+breaks Xcode-rooted projects (e.g. mcash `macos/`).
+
+For an Xcode app you still need a Build Server config next to the `.xcodeproj`
+(`buildServer.json` via [xcode-build-server](https://github.com/SolaWing/xcode-build-server)).
+See mcash `docs/development.md` and `macos/setup-lsp.sh`.
+
 ## Git blame (IDEA-style)
 
 | Command     | Description                                                                 |

@@ -105,10 +105,13 @@
                       vim.lsp.config.ts_ls = {} ; vim.lsp.enable("ts_ls")
                       vim.lsp.config.elixirls = { cmd = { "elixir-ls" } } ; vim.lsp.enable("elixirls")
                       vim.lsp.config.gopls = {} ; vim.lsp.enable("gopls")
+                      -- Darwin: use Apple SourceKit via xcrun (matches host Xcode/swiftc).
+                      -- Never prefer nixpkgs sourcekit-lsp on macOS — it shadows /usr/bin
+                      -- and breaks indexing for Xcode projects (see mcash docs/development.md).
                       vim.lsp.config.sourcekit = {
-                        cmd = { "sourcekit-lsp" },
+                        cmd = ${if pkgs.stdenv.isDarwin then ''{ "xcrun", "sourcekit-lsp" }'' else ''{ "sourcekit-lsp" }''},
                         filetypes = { "swift" },
-                        root_markers = { ".git", "compile_commands.json", ".sourcekit-lsp", "Package.swift" },
+                        root_markers = { "buildServer.json", ".bsp", "Package.swift", "compile_commands.json", ".sourcekit-lsp", ".git" },
                         capabilities = {
                           workspace = { didChangeWatchedFiles = { dynamicRegistration = true } },
                           textDocument = { diagnostic = { dynamicRegistration = true, relatedDocumentSupport = true } },
@@ -307,7 +310,9 @@
               })
             ];
             buildInputs = [ pkgs.makeWrapper ];
-            postBuild = ''
+            # Linux: ship nixpkgs sourcekit-lsp on PATH for SwiftPM projects.
+            # Darwin: do not wrap — Apple's xcrun sourcekit-lsp must win (Xcode SDK).
+            postBuild = pkgs.lib.optionalString (!pkgs.stdenv.isDarwin) ''
               wrapProgram $out/bin/nvim --prefix PATH : ${pkgs.lib.makeBinPath [ pkgs.sourcekit-lsp ]}
             '';
           };
