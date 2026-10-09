@@ -126,7 +126,11 @@
                       vim.lsp.enable("ts_ls")
                       -- Uses the project's own eslint + flat config.
                       vim.lsp.config.eslint = {} ; vim.lsp.enable("eslint")
-                      vim.lsp.config.elixirls = { cmd = { "elixir-ls" } } ; vim.lsp.enable("elixirls")
+                      vim.lsp.config('expert', {
+                        cmd = { 'expert', '--stdio' },
+                        root_markers = { 'mix.exs', '.git' },
+                        filetypes = { 'elixir', 'eelixir', 'heex' },
+                      }); vim.lsp.enable("expert")
                       vim.lsp.config.gopls = {} ; vim.lsp.enable("gopls")
                       -- Darwin + nix develop: DEVELOPER_DIR points at the store
                       -- SDK, so `xcrun`/`/usr/bin/sourcekit-lsp` fail. Call the

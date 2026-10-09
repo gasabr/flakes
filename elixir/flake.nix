@@ -13,7 +13,7 @@
           default = pkgs.mkShell {
             WALLABY_CHROMEDRIVER_PATH = "${pkgs.chromedriver}/bin/chromedriver";
             WALLABY_CHROME_BINARY = "${pkgs.google-chrome}/bin/google-chrome-stable";
-            buildInputs = [ beamPkgs.elixir_1_20 beamPkgs.elixir-ls pkgs.chromedriver pkgs.google-chrome ];
+            buildInputs = [ beamPkgs.elixir_1_20 beamPkgs.expert pkgs.chromedriver pkgs.google-chrome ];
           };
         });
     };
