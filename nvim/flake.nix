@@ -128,13 +128,16 @@
                       vim.lsp.config.eslint = {} ; vim.lsp.enable("eslint")
                       vim.lsp.config.elixirls = { cmd = { "elixir-ls" } } ; vim.lsp.enable("elixirls")
                       vim.lsp.config.gopls = {} ; vim.lsp.enable("gopls")
-                      -- Darwin: use Apple SourceKit via xcrun (matches host Xcode/swiftc).
-                      -- Never prefer nixpkgs sourcekit-lsp on macOS — it shadows /usr/bin
-                      -- and breaks indexing for Xcode projects (see mcash docs/development.md).
+                      -- Darwin + nix develop: DEVELOPER_DIR points at the store
+                      -- SDK, so `xcrun`/`/usr/bin/sourcekit-lsp` fail. Call the
+                      -- Xcode toolchain binary directly.
                       vim.lsp.config.sourcekit = {
-                        cmd = ${if pkgs.stdenv.isDarwin then ''{ "xcrun", "sourcekit-lsp" }'' else ''{ "sourcekit-lsp" }''},
+                        cmd = ${
+                          if pkgs.stdenv.isDarwin
+                          then ''{ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/sourcekit-lsp" }''
+                          else ''{ "sourcekit-lsp" }''
+                        },
                         filetypes = { "swift" },
-                        root_markers = { "buildServer.json", ".bsp", "Package.swift", "compile_commands.json", ".sourcekit-lsp", ".git" },
                         capabilities = {
                           workspace = { didChangeWatchedFiles = { dynamicRegistration = true } },
                           textDocument = { diagnostic = { dynamicRegistration = true, relatedDocumentSupport = true } },

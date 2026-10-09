@@ -5,13 +5,13 @@ collects handy shortcuts and commands. `<leader>` is the space key (default).
 
 ## Swift / SourceKit (Darwin)
 
-On macOS the editor calls `xcrun sourcekit-lsp` (host Xcode toolchain). It does
-**not** put nixpkgs `sourcekit-lsp` on PATH — that binary shadows Apple’s shim and
-breaks Xcode-rooted projects (e.g. mcash `macos/`).
+On macOS, SourceKit must be the **Xcode toolchain binary**, not `xcrun` and not
+nixpkgs. `nix develop` sets `DEVELOPER_DIR` to the store SDK, which makes
+`/usr/bin/sourcekit-lsp` fail with `tool 'sourcekit-lsp' not found`.
 
-For an Xcode app you still need a Build Server config next to the `.xcodeproj`
-(`buildServer.json` via [xcode-build-server](https://github.com/SolaWing/xcode-build-server)).
-See mcash `docs/development.md` and `macos/setup-lsp.sh`.
+This flake’s Darwin build calls that toolchain path directly and does not wrap
+nixpkgs `sourcekit-lsp` onto PATH. Xcode apps still need `buildServer.json`
+([xcode-build-server](https://github.com/SolaWing/xcode-build-server)).
 
 ## Git blame (IDEA-style)
 
