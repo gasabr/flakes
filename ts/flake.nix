@@ -10,7 +10,7 @@
         let pkgs = nixpkgs.legacyPackages.${system};
         in {
           default = pkgs.mkShell {
-            buildInputs = [ pkgs.nodejs pkgs.nodePackages.typescript-language-server ];
+            buildInputs = [ pkgs.nodejs_24 pkgs.pnpm_10 pkgs.nodePackages.typescript-language-server ];
             shellHook = ''if [[ $- == *i* ]]; then exec fish; fi'';
           };
         });

@@ -13,13 +13,11 @@
         in {
           default = pkgs.mkShell {
             buildInputs = [
-              pkgs.python310 pkgs.python311 (pkgs.python312.withPackages (ps: with ps; [ pyspark pip ]))
-              pkgs.uv pkgs.poetry pkgs.pyright pkgs.ruff pkgs.spark pkgs.openjdk17_headless
+              pkgs.python310 pkgs.python311 (pkgs.python312.withPackages (ps: with ps; [ pip ]))
+              pkgs.uv pkgs.poetry pkgs.pyright pkgs.ruff
             ];
             shellHook = ''
               export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath runtimeLibs}:$LD_LIBRARY_PATH"
-              export JAVA_HOME="${pkgs.openjdk17_headless.home}"
-              export SPARK_HOME="${pkgs.spark}"
               if [ -t 0 ]; then exec fish; fi
             '';
           };

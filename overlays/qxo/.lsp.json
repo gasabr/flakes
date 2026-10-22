@@ -1,0 +1,12 @@
+{
+  "lspServers": {
+    "python": {
+      "command": "/nix/store/w50r70yyrrxish2hd7031yqvdxl86wc9-pyright-1.1.407/bin/pyright-langserver",
+      "args": ["--stdio"],
+      "extensionToLanguage": {
+        ".py": "python",
+        ".pyi": "python"
+      }
+    }
+  }
+}

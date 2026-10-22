@@ -1,0 +1,155 @@
+{
+  "nodes": {
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1782904953,
+        "narHash": "sha256-ESJ4VgytmAt+98YLM8466luln4HyEZ9Q36b9+Bb4P5w=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "0921fdb3e13e40fe25fbc52b89661a9d6d32ac68",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-25.11-darwin",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1786367589,
+        "narHash": "sha256-OThVjKEZnNLw3eGBuxY644zKkmrDywlejQSZXR1vUUA=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "4014d8bb312b04b49ec74adff5f9b32982bd0580",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-26.05-darwin",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_3": {
+      "locked": {
+        "lastModified": 1782904953,
+        "narHash": "sha256-ESJ4VgytmAt+98YLM8466luln4HyEZ9Q36b9+Bb4P5w=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "0921fdb3e13e40fe25fbc52b89661a9d6d32ac68",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-25.11-darwin",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_4": {
+      "locked": {
+        "lastModified": 1782904953,
+        "narHash": "sha256-ESJ4VgytmAt+98YLM8466luln4HyEZ9Q36b9+Bb4P5w=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "0921fdb3e13e40fe25fbc52b89661a9d6d32ac68",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-25.11-darwin",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_5": {
+      "locked": {
+        "lastModified": 1782904953,
+        "narHash": "sha256-ESJ4VgytmAt+98YLM8466luln4HyEZ9Q36b9+Bb4P5w=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "0921fdb3e13e40fe25fbc52b89661a9d6d32ac68",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-25.11-darwin",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nvim": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_2"
+      },
+      "locked": {
+        "lastModified": 1792542679,
+        "narHash": "sha256-M3vxrDyRGT5ILNEnCRSbYCMDkQ0Fcla7EvZ3YM5AZZs=",
+        "path": "/Users/Gleb.Abroskin/Projects/flakes/nvim",
+        "type": "path"
+      },
+      "original": {
+        "path": "/Users/Gleb.Abroskin/Projects/flakes/nvim",
+        "type": "path"
+      }
+    },
+    "python": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_3"
+      },
+      "locked": {
+        "lastModified": 1792604589,
+        "narHash": "sha256-TdgMVLmwO4FNk9YSQDTIP0wKvxrm/tTGWqUGNnBCuPU=",
+        "path": "/Users/Gleb.Abroskin/Projects/flakes/python",
+        "type": "path"
+      },
+      "original": {
+        "path": "/Users/Gleb.Abroskin/Projects/flakes/python",
+        "type": "path"
+      }
+    },
+    "root": {
+      "inputs": {
+        "nixpkgs": "nixpkgs",
+        "nvim": "nvim",
+        "python": "python",
+        "tools": "tools",
+        "ts": "ts"
+      }
+    },
+    "tools": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_4"
+      },
+      "locked": {
+        "lastModified": 1792685033,
+        "narHash": "sha256-tDKRkmw0MIUH5I25m3Yye6X4dReR+SQlSkWMyZ5SuE4=",
+        "path": "/Users/Gleb.Abroskin/Projects/flakes/cli-tools",
+        "type": "path"
+      },
+      "original": {
+        "path": "/Users/Gleb.Abroskin/Projects/flakes/cli-tools",
+        "type": "path"
+      }
+    },
+    "ts": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_5"
+      },
+      "locked": {
+        "lastModified": 1792604945,
+        "narHash": "sha256-r9CpZLoWCwFoMr0CwJf0o+JiuUDF1MecvtREWzy9eTI=",
+        "path": "/Users/Gleb.Abroskin/Projects/flakes/ts",
+        "type": "path"
+      },
+      "original": {
+        "path": "/Users/Gleb.Abroskin/Projects/flakes/ts",
+        "type": "path"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

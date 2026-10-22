@@ -9,15 +9,17 @@
         let pkgs = nixpkgs.legacyPackages.${system};
         in {
           default = pkgs.mkShell {
-            buildInputs = [ pkgs.git pkgs.jq pkgs.lazygit pkgs.ripgrep pkgs.k9s pkgs.kubectl pkgs.doctl pkgs.cursor-cli pkgs.github-cli pkgs.clickhouse pkgs.pgcli pkgs.mdformat ];
+            buildInputs = [ pkgs.git pkgs.git-lfs pkgs.google-cloud-sdk pkgs.jq pkgs.lazygit pkgs.ripgrep pkgs.k9s pkgs.kubectl pkgs.doctl pkgs.cursor-cli pkgs.github-cli pkgs.clickhouse pkgs.pgcli pkgs.mdformat ];
             shellHook = ''
               if [[ $- == *i* ]]; then
                 exec fish --init-command '
                   abbr -a gp "git pull"
+                  abbr -a gpp "git push"
                   abbr -a gst "git status"
                   abbr -a gf "git fetch"
                   abbr -a lg "lazygit"
                   abbr -a dc "docker-compose"
+                  abbr -a gco "git checkout"
                 '
               fi
             '';
