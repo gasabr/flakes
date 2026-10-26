@@ -85,8 +85,8 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1792542679,
-        "narHash": "sha256-M3vxrDyRGT5ILNEnCRSbYCMDkQ0Fcla7EvZ3YM5AZZs=",
+        "lastModified": 1792701821,
+        "narHash": "sha256-xPshyt4dysUEyhrgQdaXKpP6UgdDRYRSIrFDbJw3YqE=",
         "path": "/Users/Gleb.Abroskin/Projects/flakes/nvim",
         "type": "path"
       },
@@ -124,8 +124,8 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1792685033,
-        "narHash": "sha256-tDKRkmw0MIUH5I25m3Yye6X4dReR+SQlSkWMyZ5SuE4=",
+        "lastModified": 1793041149,
+        "narHash": "sha256-6n/q4lyIAku1HmKt4AxxToQ4Qjd22SQuP6/ntUVyt84=",
         "path": "/Users/Gleb.Abroskin/Projects/flakes/cli-tools",
         "type": "path"
       },
@@ -139,8 +139,8 @@
         "nixpkgs": "nixpkgs_5"
       },
       "locked": {
-        "lastModified": 1792604945,
-        "narHash": "sha256-r9CpZLoWCwFoMr0CwJf0o+JiuUDF1MecvtREWzy9eTI=",
+        "lastModified": 1792701829,
+        "narHash": "sha256-f7rnjUsX1AwXwyu/GojCLjnKJhI/gS3dzW7j8ltTevM=",
         "path": "/Users/Gleb.Abroskin/Projects/flakes/ts",
         "type": "path"
       },

@@ -20,7 +20,6 @@
                     set termguicolors
                     colorscheme hybrid
                     autocmd FileType python setlocal foldmethod=indent foldlevel=99
-                    autocmd FileType typescript,typescriptreact,javascript,javascriptreact setlocal tabstop=2 shiftwidth=2
                     autocmd FileType swift setlocal tabstop=4 shiftwidth=4
                     let g:airline_section_b = '%{FugitiveHead()}%{empty(get(g:, "gh_pr_status", "")) ? "" : " " . g:gh_pr_status}'
                     let g:airline_section_c = ""
@@ -102,7 +101,29 @@
                       vim.lsp.config.pyright = {} ; vim.lsp.enable("pyright")
                       vim.lsp.config.clangd = {} ; vim.lsp.enable("clangd")
                       vim.lsp.config.ruff = {} ; vim.lsp.enable("ruff")
-                      vim.lsp.config.ts_ls = {} ; vim.lsp.enable("ts_ls")
+                      -- Repos that ship TS 7 (@typescript/native) get its own LSP (`tsc --lsp`);
+                      -- everything else keeps ts_ls.
+                      local js_root_markers = { { "pnpm-lock.yaml", "package-lock.json", "yarn.lock", "bun.lock", "bun.lockb" }, ".git" }
+                      local function ts7_root(bufnr)
+                        local root = vim.fs.root(bufnr, js_root_markers)
+                        if root and vim.uv.fs_stat(root .. "/node_modules/@typescript/native/bin/tsc") then return root end
+                      end
+                      vim.lsp.config.tsgo = {
+                        cmd = function(dispatchers, config)
+                          return vim.lsp.rpc.start({ "node", config.root_dir .. "/node_modules/@typescript/native/bin/tsc", "--lsp", "--stdio" }, dispatchers, { cwd = config.root_dir })
+                        end,
+                        root_dir = function(bufnr, on_dir) local root = ts7_root(bufnr) ; if root then on_dir(root) end end,
+                      }
+                      vim.lsp.enable("tsgo")
+                      vim.lsp.config.ts_ls = {
+                        root_dir = function(bufnr, on_dir)
+                          if ts7_root(bufnr) then return end
+                          on_dir(vim.fs.root(bufnr, js_root_markers) or vim.fn.getcwd())
+                        end,
+                      }
+                      vim.lsp.enable("ts_ls")
+                      -- Uses the project's own eslint + flat config.
+                      vim.lsp.config.eslint = {} ; vim.lsp.enable("eslint")
                       vim.lsp.config.elixirls = { cmd = { "elixir-ls" } } ; vim.lsp.enable("elixirls")
                       vim.lsp.config.gopls = {} ; vim.lsp.enable("gopls")
                       -- Darwin: use Apple SourceKit via xcrun (matches host Xcode/swiftc).
@@ -136,6 +157,24 @@
                         vim.lsp.buf.format({ bufnr = ev.buf, async = false, filter = function(c) return c.name == "ruff" end })
                       end,
                     })
+                    -- JS/TS: project's prettier (node_modules/.bin, its config + plugins), only where a
+                    -- prettier config exists; eslint --fix first when the eslint LSP is attached.
+                    local ok_conform, conform = pcall(require, "conform")
+                    if ok_conform then
+                      local prettier_fts = { "javascript", "javascriptreact", "typescript", "typescriptreact", "json", "jsonc", "yaml", "markdown", "css", "scss", "html" }
+                      local formatters_by_ft = {}
+                      for _, ft in ipairs(prettier_fts) do formatters_by_ft[ft] = { "prettier" } end
+                      conform.setup({ formatters_by_ft = formatters_by_ft, formatters = { prettier = { require_cwd = true } } })
+                      vim.api.nvim_create_autocmd("BufWritePre", {
+                        callback = function(ev)
+                          if not formatters_by_ft[vim.bo[ev.buf].filetype] then return end
+                          if #vim.lsp.get_clients({ bufnr = ev.buf, name = "eslint" }) > 0 then
+                            vim.api.nvim_buf_call(ev.buf, function() vim.cmd("silent! LspEslintFixAll") end)
+                          end
+                          conform.format({ bufnr = ev.buf, timeout_ms = 5000 })
+                        end,
+                      })
+                    end
                     local ok_cmp, cmp = pcall(require, 'cmp')
                     if ok_cmp then
                       cmp.setup({
@@ -235,7 +274,7 @@
                     vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
                     vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
                     vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, opts)
-                    vim.keymap.set('n', '<space>f', function() vim.lsp.buf.format { async = true } end, opts)
+                    vim.keymap.set('n', '<space>f', function() if ok_conform then conform.format({ async = true, lsp_format = "fallback" }) else vim.lsp.buf.format { async = true } end end, opts)
                     vim.keymap.set('n', '<leader>1', ':NERDTreeToggle<CR>', { silent = true, desc = "Toggle NERDTree" })
                     vim.keymap.set('n', '<M-t>', ':NERDTreeFind<CR>', { silent = true, desc = "Find current file in NERDTree" })
                     vim.keymap.set('n', '<C-p>', '<cmd>Telescope find_files<CR>', { silent = true, desc = "Find files" })
@@ -266,7 +305,7 @@
                   '';
                   packages.myVimPackage.start = with pkgs.vimPlugins; [
                     vim-elixir vim-nix vim-hybrid vim-airline vim-airline-themes vim-fugitive tagbar nvim-lspconfig nvim-cmp cmp-nvim-lsp cmp-buffer nerdtree telescope-nvim plenary-nvim telescope-fzf-native-nvim comment-nvim hop-nvim gitsigns-nvim
-                    nvim-nio
+                    nvim-nio conform-nvim
                     (nvim-treesitter.withPlugins (p: [ p.html p.xml p.css p.javascript p.typescript p.tsx p.python p.nix p.yaml p.dockerfile p.json p.toml p.sql p.elixir p.heex p.eex p.go p.gomod p.gosum p.swift ]))
                   ];
                 };

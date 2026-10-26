@@ -32,7 +32,7 @@
               (noExec python.devShells.${system}.default)
               (noExec ts.devShells.${system}.default)
             ];
-            buildInputs = [ nvim.packages.${system}.default pkgs.jdk21 ];
+            buildInputs = [ nvim.packages.${system}.default pkgs.jdk21 pkgs.glab ];
             JAVA_HOME = pkgs.jdk21.home;
           };
         });
