@@ -305,6 +305,27 @@
                     end, { silent = true, desc = "Open PR in browser" })
                     vim.keymap.set('n', '<D-/>', 'gcc', { remap = true }) ; vim.keymap.set('v', '<D-/>', 'gc', { remap = true })
                     vim.keymap.set('n', '<C-/>', 'gcc', { remap = true }) ; vim.keymap.set('v', '<C-/>', 'gc', { remap = true })
+                    -- \nc: toggle folding away every comment block (treesitter node, else 'commentstring' prefix).
+                    function _G.CommentFoldExpr(lnum)
+                      local line = vim.fn.getline(lnum)
+                      local col = line:find('%S')
+                      if not col then return '=' end
+                      local ok, node = pcall(vim.treesitter.get_node, { pos = { lnum - 1, col - 1 }, ignore_injections = false })
+                      if ok and node then return node:type():find('comment') and '1' or '0' end
+                      local prefix = vim.trim((vim.bo.commentstring:match('^(.-)%%s') or ""))
+                      return (prefix ~= "" and vim.startswith(vim.trim(line), prefix)) and '1' or '0'
+                    end
+                    vim.keymap.set('n', '<leader>nc', function()
+                      local saved = vim.w.comment_fold_saved
+                      if saved then
+                        vim.wo.foldmethod, vim.wo.foldexpr, vim.wo.foldlevel, vim.wo.foldminlines = unpack(saved)
+                        vim.w.comment_fold_saved = nil
+                      else
+                        vim.w.comment_fold_saved = { vim.wo.foldmethod, vim.wo.foldexpr, vim.wo.foldlevel, vim.wo.foldminlines }
+                        vim.wo.foldmethod, vim.wo.foldexpr, vim.wo.foldlevel, vim.wo.foldminlines = 'expr', 'v:lua.CommentFoldExpr(v:lnum)', 0, 0
+                      end
+                      vim.cmd('normal! zx')
+                    end, { silent = true, desc = "Toggle hiding comment lines" })
                     vim.keymap.set('n', ']d', function() vim.diagnostic.goto_next() ; vim.schedule(function() vim.diagnostic.open_float() end) end, opts)
                     vim.keymap.set('n', '[d', function() vim.diagnostic.goto_prev() ; vim.schedule(function() vim.diagnostic.open_float() end) end, opts)
                   EOF
