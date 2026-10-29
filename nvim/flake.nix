@@ -20,6 +20,7 @@
                     set termguicolors
                     colorscheme hybrid
                     autocmd FileType python setlocal foldmethod=indent foldlevel=99
+                    autocmd FileType json,jsonc setlocal foldenable foldmethod=expr foldexpr=v:lua.vim.treesitter.foldexpr() foldlevel=99 | lua pcall(vim.treesitter.start, 0, 'json')
                     autocmd FileType swift setlocal tabstop=4 shiftwidth=4
                     let g:airline_section_b = '%{FugitiveHead()}%{empty(get(g:, "gh_pr_status", "")) ? "" : " " . g:gh_pr_status}'
                     let g:airline_section_c = ""
