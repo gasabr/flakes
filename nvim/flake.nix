@@ -190,6 +190,12 @@
                     if ok_ts then ts.setup({ highlight = { enable = true, additional_vim_regex_highlighting = { "heex", "eex", "leex" } } }) end
                     vim.api.nvim_create_autocmd("FileType", { pattern = { "heex", "eex", "leex" }, callback = function(args) pcall(vim.treesitter.start, args.buf) end })
                     vim.o.foldmethod = 'expr' ; vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()' ; vim.o.foldlevelstart = 99 ; vim.o.foldtext = ""
+                    -- IDEA-style sticky header: enclosing function/class lines pinned on top when scrolled past.
+                    local ok_tsc, tsc = pcall(require, 'treesitter-context')
+                    if ok_tsc then
+                      local tsc_fts = { javascript = true, javascriptreact = true, typescript = true, typescriptreact = true }
+                      tsc.setup({ max_lines = 3, trim_scope = 'outer', on_attach = function(buf) return tsc_fts[vim.bo[buf].filetype] or false end })
+                    end
                     local ok_comment, comment = pcall(require, 'Comment') ; if ok_comment then comment.setup() end
                     local ok_gs, gitsigns = pcall(require, 'gitsigns')
                     if ok_gs then
@@ -304,7 +310,7 @@
                   EOF
                   '';
                   packages.myVimPackage.start = with pkgs.vimPlugins; [
-                    vim-elixir vim-nix vim-hybrid vim-airline vim-airline-themes vim-fugitive tagbar nvim-lspconfig nvim-cmp cmp-nvim-lsp cmp-buffer nerdtree telescope-nvim plenary-nvim telescope-fzf-native-nvim comment-nvim hop-nvim gitsigns-nvim
+                    vim-elixir vim-nix vim-hybrid vim-airline vim-airline-themes vim-fugitive tagbar nvim-lspconfig nvim-cmp cmp-nvim-lsp cmp-buffer nerdtree telescope-nvim plenary-nvim telescope-fzf-native-nvim comment-nvim hop-nvim gitsigns-nvim nvim-treesitter-context
                     nvim-nio conform-nvim
                     (nvim-treesitter.withPlugins (p: [ p.html p.xml p.css p.javascript p.typescript p.tsx p.python p.nix p.yaml p.dockerfile p.json p.toml p.sql p.elixir p.heex p.eex p.go p.gomod p.gosum p.swift ]))
                   ];
