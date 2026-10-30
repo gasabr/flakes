@@ -101,8 +101,8 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1793394817,
-        "narHash": "sha256-F6lOSs6oG6pFpJycdkpLu/Y+78SEMq/eZhyveVL3y8g=",
+        "lastModified": 1793399088,
+        "narHash": "sha256-fv2PA9bmbOOZCVucSgjBMmitjznPaNyDspd2nmkvp5U=",
         "path": "/Users/Gleb.Abroskin/Projects/flakes/nvim",
         "type": "path"
       },
