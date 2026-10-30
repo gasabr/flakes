@@ -30,6 +30,7 @@
                     set background=dark
                     let g:airline_powerline_fonts = 0
                     let g:airline_theme = 'hybrid'
+                    let g:NERDTreeWinSize = 44
                     let g:airline_highlighting_cache = 1
                     let g:airline_left_sep = ""
                     let g:airline_left_alt_sep = ""
@@ -221,6 +222,7 @@
                       telescope.setup({
                         defaults = {
                           layout_strategy = 'horizontal', layout_config = { prompt_position = 'top', preview_width = 0.5, width = 0.85, height = 0.8 },
+                          path_display = { "filename_first" },
                           sorting_strategy = 'ascending', file_ignore_patterns = { "^%.git/", "node_modules/", "%.venv/", "__pycache__/", "%.pytest_cache/", "_build/", "deps/" },
                           mappings = { i = { ["<C-n>"] = actions.move_selection_next, ["<C-p>"] = actions.move_selection_previous, ["<Esc>"] = actions.close } },
                         },
