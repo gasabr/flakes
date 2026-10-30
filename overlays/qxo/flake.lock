@@ -16,6 +16,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-unstable": {
+      "locked": {
+        "lastModified": 1792842277,
+        "narHash": "sha256-pGPnZGi8y9d76xNeracniXO3dsYVROEmMkMc8jD0Ihc=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "d3b13ad75cc492690728f9307e443dec9ef9a20e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs_2": {
       "locked": {
         "lastModified": 1786367589,
@@ -85,8 +101,8 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1792701821,
-        "narHash": "sha256-xPshyt4dysUEyhrgQdaXKpP6UgdDRYRSIrFDbJw3YqE=",
+        "lastModified": 1793394817,
+        "narHash": "sha256-F6lOSs6oG6pFpJycdkpLu/Y+78SEMq/eZhyveVL3y8g=",
         "path": "/Users/Gleb.Abroskin/Projects/flakes/nvim",
         "type": "path"
       },
@@ -121,11 +137,12 @@
     },
     "tools": {
       "inputs": {
-        "nixpkgs": "nixpkgs_4"
+        "nixpkgs": "nixpkgs_4",
+        "nixpkgs-unstable": "nixpkgs-unstable"
       },
       "locked": {
-        "lastModified": 1793041149,
-        "narHash": "sha256-6n/q4lyIAku1HmKt4AxxToQ4Qjd22SQuP6/ntUVyt84=",
+        "lastModified": 1793119264,
+        "narHash": "sha256-M61lwEUAl9bU6ZPowby0yU+s2YQedpq8OgPk8oyP8zE=",
         "path": "/Users/Gleb.Abroskin/Projects/flakes/cli-tools",
         "type": "path"
       },
