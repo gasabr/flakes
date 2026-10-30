@@ -190,7 +190,7 @@
                     local ok_ts, ts = pcall(require, 'nvim-treesitter.configs')
                     if ok_ts then ts.setup({ highlight = { enable = true, additional_vim_regex_highlighting = { "heex", "eex", "leex" } } }) end
                     vim.api.nvim_create_autocmd("FileType", { pattern = { "heex", "eex", "leex" }, callback = function(args) pcall(vim.treesitter.start, args.buf) end })
-                    vim.o.foldmethod = 'expr' ; vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()' ; vim.o.foldlevelstart = 99 ; vim.o.foldtext = ""
+                    vim.o.foldmethod = 'expr' ; vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()' ; vim.o.foldlevelstart = 99 ; vim.o.foldtext = "" ; vim.opt.fillchars:append({ fold = ' ' })
                     -- IDEA-style sticky header: enclosing function/class lines pinned on top when scrolled past.
                     local ok_tsc, tsc = pcall(require, 'treesitter-context')
                     if ok_tsc then
