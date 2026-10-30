@@ -177,13 +177,40 @@
                         end,
                       })
                     end
+                    local ok_pairs, autopairs = pcall(require, 'nvim-autopairs')
+                    if ok_pairs then autopairs.setup({}) end
+                    -- Live templates: type the key at line start, press <Tab>; <Tab>/<S-Tab> then jump between placeholders.
+                    local js_templates = { ['if'] = 'if (''${1}) {\n\t''${0}\n}' }
+                    local templates = { javascript = js_templates, typescript = js_templates, javascriptreact = js_templates, typescriptreact = js_templates }
+                    local function expand_template(before_expand)
+                      local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+                      local before = vim.api.nvim_get_current_line():sub(1, col)
+                      local word = before:match('(%w+)$')
+                      local body = word and (templates[vim.bo.filetype] or {})[word]
+                      if not body or not before:sub(1, col - #word):match('^%s*$') then return false end
+                      before_expand()
+                      vim.api.nvim_buf_set_text(0, row - 1, col - #word, row - 1, col, {})
+                      vim.api.nvim_win_set_cursor(0, { row, col - #word })
+                      vim.snippet.expand(body)
+                      return true
+                    end
                     local ok_cmp, cmp = pcall(require, 'cmp')
                     if ok_cmp then
                       cmp.setup({
                         sources = cmp.config.sources({ { name = 'nvim_lsp' } }, { { name = 'buffer' } }),
                         mapping = cmp.mapping.preset.insert({
                           ['<C-Space>'] = cmp.mapping.complete(), ['<CR>'] = cmp.mapping.confirm({ select = true }),
-                          ['<Tab>'] = cmp.mapping.select_next_item(), ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+                          ['<Tab>'] = cmp.mapping(function(fallback)
+                            if expand_template(function() cmp.close() end) then return end
+                            if vim.snippet.active({ direction = 1 }) then vim.snippet.jump(1)
+                            elseif cmp.visible() then cmp.select_next_item()
+                            else fallback() end
+                          end, { 'i', 's' }),
+                          ['<S-Tab>'] = cmp.mapping(function(fallback)
+                            if vim.snippet.active({ direction = -1 }) then vim.snippet.jump(-1)
+                            elseif cmp.visible() then cmp.select_prev_item()
+                            else fallback() end
+                          end, { 'i', 's' }),
                           ['<C-n>'] = cmp.mapping.select_next_item(), ['<C-p>'] = cmp.mapping.select_prev_item(), ['<C-e>'] = cmp.mapping.abort(),
                         }),
                       })
@@ -364,7 +391,7 @@
                   EOF
                   '';
                   packages.myVimPackage.start = with pkgs.vimPlugins; [
-                    vim-elixir vim-nix vim-hybrid vim-airline vim-airline-themes vim-fugitive tagbar nvim-lspconfig nvim-cmp cmp-nvim-lsp cmp-buffer nerdtree telescope-nvim plenary-nvim telescope-fzf-native-nvim comment-nvim hop-nvim gitsigns-nvim nvim-treesitter-context
+                    vim-elixir vim-nix vim-hybrid vim-airline vim-airline-themes vim-fugitive tagbar nvim-lspconfig nvim-cmp cmp-nvim-lsp cmp-buffer nerdtree nvim-autopairs telescope-nvim plenary-nvim telescope-fzf-native-nvim comment-nvim hop-nvim gitsigns-nvim nvim-treesitter-context
                     nvim-nio conform-nvim
                     (nvim-treesitter.withPlugins (p: [ p.html p.xml p.css p.javascript p.typescript p.tsx p.python p.nix p.yaml p.dockerfile p.json p.toml p.sql p.elixir p.heex p.eex p.go p.gomod p.gosum p.swift ]))
                   ];
