@@ -306,13 +306,38 @@
                     end, { silent = true, desc = "Open PR in browser" })
                     vim.keymap.set('n', '<D-/>', 'gcc', { remap = true }) ; vim.keymap.set('v', '<D-/>', 'gc', { remap = true })
                     vim.keymap.set('n', '<C-/>', 'gcc', { remap = true }) ; vim.keymap.set('v', '<C-/>', 'gc', { remap = true })
-                    -- \nc: toggle folding away every comment block (treesitter node, else 'commentstring' prefix).
+                    -- \nc: toggle folding away every whole-line comment (treesitter comment nodes, else 'commentstring' prefix).
+                    -- Comment rows are collected once per changedtick; parser is fetched directly since nvim-treesitter no longer attaches one.
+                    local _comment_rows = {}
+                    local function comment_rows(buf)
+                      local tick = vim.b[buf].changedtick
+                      local c = _comment_rows[buf]
+                      if c and c.tick == tick then return c.rows end
+                      local rows
+                      local parser = vim.treesitter.get_parser(buf, nil, { error = false })
+                      if parser then
+                        rows = {}
+                        local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+                        local function walk(node)
+                          if node:type():find('comment') then
+                            local sr, sc, er, ec = node:range()
+                            if lines[sr + 1]:sub(1, sc):match('^%s*$') and (lines[er + 1] or ""):sub(ec + 1):match('^%s*$') then
+                              for r = sr + 1, (ec == 0 and er or er + 1) do rows[r] = true end
+                            end
+                            return
+                          end
+                          for child in node:iter_children() do if child:named() then walk(child) end end
+                        end
+                        for _, tree in ipairs(parser:parse()) do walk(tree:root()) end
+                      end
+                      _comment_rows[buf] = { tick = tick, rows = rows }
+                      return rows
+                    end
                     function _G.CommentFoldExpr(lnum)
                       local line = vim.fn.getline(lnum)
-                      local col = line:find('%S')
-                      if not col then return '=' end
-                      local ok, node = pcall(vim.treesitter.get_node, { pos = { lnum - 1, col - 1 }, ignore_injections = false })
-                      if ok and node then return node:type():find('comment') and '1' or '0' end
+                      if not line:find('%S') then return '=' end
+                      local rows = comment_rows(vim.api.nvim_get_current_buf())
+                      if rows then return rows[lnum] and '1' or '0' end
                       local prefix = vim.trim((vim.bo.commentstring:match('^(.-)%%s') or ""))
                       return (prefix ~= "" and vim.startswith(vim.trim(line), prefix)) and '1' or '0'
                     end
@@ -325,7 +350,7 @@
                         vim.w.comment_fold_saved = { vim.wo.foldmethod, vim.wo.foldexpr, vim.wo.foldlevel, vim.wo.foldminlines }
                         vim.wo.foldmethod, vim.wo.foldexpr, vim.wo.foldlevel, vim.wo.foldminlines = 'expr', 'v:lua.CommentFoldExpr(v:lnum)', 0, 0
                       end
-                      vim.cmd('normal! zx')
+                      vim.cmd('normal! zX')
                     end, { silent = true, desc = "Toggle hiding comment lines" })
                     vim.keymap.set('n', ']d', function() vim.diagnostic.goto_next() ; vim.schedule(function() vim.diagnostic.open_float() end) end, opts)
                     vim.keymap.set('n', '[d', function() vim.diagnostic.goto_prev() ; vim.schedule(function() vim.diagnostic.open_float() end) end, opts)
