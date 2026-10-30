@@ -156,8 +156,8 @@
         "nixpkgs": "nixpkgs_5"
       },
       "locked": {
-        "lastModified": 1792701829,
-        "narHash": "sha256-f7rnjUsX1AwXwyu/GojCLjnKJhI/gS3dzW7j8ltTevM=",
+        "lastModified": 1793400213,
+        "narHash": "sha256-obiBXLANyD8xqfwof+4k1M1CeVI5VUewOJhSaOKENRE=",
         "path": "/Users/Gleb.Abroskin/Projects/flakes/ts",
         "type": "path"
       },
