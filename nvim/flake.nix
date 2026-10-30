@@ -341,14 +341,19 @@
                       local prefix = vim.trim((vim.bo.commentstring:match('^(.-)%%s') or ""))
                       return (prefix ~= "" and vim.startswith(vim.trim(line), prefix)) and '1' or '0'
                     end
+                    -- Local scope only: a global foldminlines change makes treesitter refresh every cached buffer, incl. wiped ones.
+                    local fold_opts = { 'foldmethod', 'foldexpr', 'foldlevel', 'foldminlines' }
+                    local function set_fold_opts(vals)
+                      for i, name in ipairs(fold_opts) do vim.api.nvim_set_option_value(name, vals[i], { scope = 'local' }) end
+                    end
                     vim.keymap.set('n', '<leader>nc', function()
                       local saved = vim.w.comment_fold_saved
                       if saved then
-                        vim.wo.foldmethod, vim.wo.foldexpr, vim.wo.foldlevel, vim.wo.foldminlines = unpack(saved)
+                        set_fold_opts(saved)
                         vim.w.comment_fold_saved = nil
                       else
-                        vim.w.comment_fold_saved = { vim.wo.foldmethod, vim.wo.foldexpr, vim.wo.foldlevel, vim.wo.foldminlines }
-                        vim.wo.foldmethod, vim.wo.foldexpr, vim.wo.foldlevel, vim.wo.foldminlines = 'expr', 'v:lua.CommentFoldExpr(v:lnum)', 0, 0
+                        vim.w.comment_fold_saved = vim.tbl_map(function(name) return vim.api.nvim_get_option_value(name, { scope = 'local' }) end, fold_opts)
+                        set_fold_opts({ 'expr', 'v:lua.CommentFoldExpr(v:lnum)', 0, 0 })
                       end
                       vim.cmd('normal! zX')
                     end, { silent = true, desc = "Toggle hiding comment lines" })
