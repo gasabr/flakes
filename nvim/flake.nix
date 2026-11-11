@@ -282,6 +282,43 @@
                         },
                       })
                       pcall(telescope.load_extension, 'fzf')
+                      -- Full path of the previewed file in a line under the picker; results show shortened dirs.
+                      local path_win, path_buf
+                      vim.api.nvim_create_autocmd('User', { pattern = 'TelescopePreviewerLoaded', callback = function(ev)
+                        local name = ev.data and ev.data.bufname
+                        if not name or name == "" then return end
+                        local prompt_buf
+                        for _, w in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+                          local b = vim.api.nvim_win_get_buf(w)
+                          if vim.bo[b].filetype == 'TelescopePrompt' then prompt_buf = b ; break end
+                        end
+                        if not prompt_buf then return end
+                        local layout = require('telescope.actions.state').get_current_picker(prompt_buf).layout
+                        local top, left, right = 0, math.huge, 0
+                        for _, part in ipairs({ layout.results, layout.preview, layout.prompt }) do
+                          for _, w in ipairs({ part and part.winid, part and part.border and part.border.winid }) do
+                            if w and vim.api.nvim_win_is_valid(w) then
+                              local pos = vim.api.nvim_win_get_position(w)
+                              top = math.max(top, pos[1] + vim.api.nvim_win_get_height(w))
+                              left = math.min(left, pos[2]) ; right = math.max(right, pos[2] + vim.api.nvim_win_get_width(w))
+                            end
+                          end
+                        end
+                        if left == math.huge then return end
+                        if not (path_buf and vim.api.nvim_buf_is_valid(path_buf)) then path_buf = vim.api.nvim_create_buf(false, true) end
+                        vim.api.nvim_buf_set_lines(path_buf, 0, -1, false, { " " .. vim.fn.fnamemodify(name, ':.') })
+                        local cfg = { relative = 'editor', row = top, col = left, width = right - left, height = 1, style = 'minimal', focusable = false, zindex = 200 }
+                        if path_win and vim.api.nvim_win_is_valid(path_win) then
+                          vim.api.nvim_win_set_config(path_win, cfg)
+                        else
+                          path_win = vim.api.nvim_open_win(path_buf, false, cfg)
+                          vim.wo[path_win].winhl = 'Normal:TelescopeNormal'
+                          vim.api.nvim_create_autocmd('BufWipeout', { buffer = prompt_buf, once = true, callback = function()
+                            if path_win and vim.api.nvim_win_is_valid(path_win) then vim.api.nvim_win_close(path_win, true) end
+                            path_win = nil
+                          end })
+                        end
+                      end })
                     end
                     vim.g.gh_pr_status = ""
                     local _gh_pr_cache = {}
