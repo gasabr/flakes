@@ -2,7 +2,7 @@
   description = "qxo — Python + TypeScript + CLI tools + Neovim dev environment";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-25.11-darwin";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-26.05-darwin";
     nvim.url    = "path:/Users/Gleb.Abroskin/Projects/flakes/nvim";
     python.url  = "path:/Users/Gleb.Abroskin/Projects/flakes/python";
     ts.url      = "path:/Users/Gleb.Abroskin/Projects/flakes/ts";
