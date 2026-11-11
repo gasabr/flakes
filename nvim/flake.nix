@@ -132,6 +132,12 @@
                         filetypes = { 'elixir', 'eelixir', 'heex' },
                       }); vim.lsp.enable("expert")
                       vim.lsp.config.gopls = {} ; vim.lsp.enable("gopls")
+                      vim.lsp.config('rust_analyzer', {
+                        settings = { ["rust-analyzer"] = {
+                          check = { command = "clippy" },
+                          cargo = { allFeatures = true },
+                        } },
+                      }); vim.lsp.enable("rust_analyzer")
                       -- Darwin + nix develop: DEVELOPER_DIR points at the store
                       -- SDK, so `xcrun`/`/usr/bin/sourcekit-lsp` fail. Call the
                       -- Xcode toolchain binary directly.
@@ -201,6 +207,10 @@
                       vim.snippet.expand(body)
                       return true
                     end
+                    vim.api.nvim_create_autocmd("BufWritePre", {
+                      pattern = "*.rs",
+                      callback = function(ev) vim.lsp.buf.format({ bufnr = ev.buf, async = false, filter = function(c) return c.name == "rust_analyzer" end }) end,
+                    })
                     local ok_cmp, cmp = pcall(require, 'cmp')
                     if ok_cmp then
                       cmp.setup({
@@ -437,7 +447,7 @@
                   packages.myVimPackage.start = with pkgs.vimPlugins; [
                     vim-elixir vim-nix vim-hybrid vim-airline vim-airline-themes vim-fugitive tagbar nvim-lspconfig nvim-cmp cmp-nvim-lsp cmp-buffer nerdtree nvim-autopairs telescope-nvim plenary-nvim telescope-fzf-native-nvim comment-nvim hop-nvim gitsigns-nvim nvim-treesitter-context
                     nvim-nio conform-nvim
-                    (nvim-treesitter.withPlugins (p: [ p.html p.xml p.css p.javascript p.typescript p.tsx p.python p.nix p.yaml p.dockerfile p.json p.toml p.sql p.elixir p.heex p.eex p.go p.gomod p.gosum p.swift ]))
+                    (nvim-treesitter.withPlugins (p: [ p.html p.xml p.css p.javascript p.typescript p.tsx p.python p.nix p.yaml p.dockerfile p.json p.toml p.sql p.elixir p.heex p.eex p.go p.gomod p.gosum p.swift p.rust ]))
                   ];
                 };
               })
