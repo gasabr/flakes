@@ -31,7 +31,7 @@
           };
         in {
           default = pkgs.mkShell {
-            buildInputs = [ pkgs.git unstable.terragrunt terraform pkgs.opentofu pkgs.git-lfs (pkgs.google-cloud-sdk.withExtraComponents [ pkgs.google-cloud-sdk.components.gke-gcloud-auth-plugin ]) pkgs.jq pkgs.lazygit pkgs.ripgrep pkgs.k9s pkgs.kubectl pkgs.doctl pkgs.cursor-cli pkgs.github-cli pkgs.clickhouse pkgs.pgcli pkgs.mdformat ];
+            buildInputs = [ pkgs.git unstable.terragrunt terraform pkgs.opentofu pkgs.git-lfs (pkgs.google-cloud-sdk.withExtraComponents [ pkgs.google-cloud-sdk.components.gke-gcloud-auth-plugin ]) pkgs.jq pkgs.lazygit pkgs.ripgrep pkgs.k9s pkgs.kubectl pkgs.kubernetes-helm pkgs.doctl pkgs.cursor-cli pkgs.github-cli pkgs.clickhouse pkgs.pgcli pkgs.mdformat ];
             shellHook = ''
               if [[ $- == *i* ]]; then
                 exec fish --init-command '
