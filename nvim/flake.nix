@@ -463,6 +463,11 @@
                       end
                       vim.notify("Diagnostic messages " .. (vt and "off" or "on"))
                     end, { silent = true, desc = "Toggle diagnostic messages (keep signs)" })
+                    vim.keymap.set('n', '<leader>sl', function()
+                      local on = not vim.diagnostic.config().signs
+                      vim.diagnostic.config({ signs = on, underline = on })
+                      vim.notify("Diagnostic signs/underlines " .. (on and "on" or "off"))
+                    end, { silent = true, desc = "Toggle diagnostic signs and underlines" })
                     vim.keymap.set('n', ']d', function() vim.diagnostic.goto_next() ; vim.schedule(function() vim.diagnostic.open_float() end) end, opts)
                     vim.keymap.set('n', '[d', function() vim.diagnostic.goto_prev() ; vim.schedule(function() vim.diagnostic.open_float() end) end, opts)
                   EOF
