@@ -34,11 +34,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1786367589,
-        "narHash": "sha256-OThVjKEZnNLw3eGBuxY644zKkmrDywlejQSZXR1vUUA=",
+        "lastModified": 1794217284,
+        "narHash": "sha256-Ya0ojDh1BF5zgyZRlehygC0ZvvEg2WaGZWn1xiNozmM=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "4014d8bb312b04b49ec74adff5f9b32982bd0580",
+        "rev": "f4244ef33645badc8157562b5e80748929b396c2",
         "type": "github"
       },
       "original": {
@@ -85,8 +85,8 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1794373733,
-        "narHash": "sha256-2vv3SUqHst6AcXoEwW+Se5M9oMk6xjkn7I5EshxKky8=",
+        "lastModified": 1794540998,
+        "narHash": "sha256-HSb9jOdggrnsXTinD9pXwDoMjeJ6g0b1J7jHzNcO6bc=",
         "path": "/Users/gasabr/Projects/flakes/nvim",
         "type": "path"
       },

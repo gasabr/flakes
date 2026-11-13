@@ -18,6 +18,7 @@ nixpkgs `sourcekit-lsp` onto PATH. Xcode apps still need `buildServer.json`
 | Keys          | Description                                                        |
 | ------------- | ------------------------------------------------------------------ |
 | `<leader>sd`  | Toggle diagnostics (inline text, signs, underlines) on/off globally |
+| `<leader>sv`  | Toggle inline diagnostic messages; signs (W/H) and underlines stay |
 | `]d` / `[d`   | Jump to next / previous diagnostic and show it in a float          |
 
 ## Git blame (IDEA-style)

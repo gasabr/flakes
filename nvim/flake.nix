@@ -452,6 +452,17 @@
                       vim.diagnostic.enable(on)
                       vim.notify("Diagnostics " .. (on and "on" or "off"))
                     end, { silent = true, desc = "Toggle diagnostics" })
+                    local saved_virtual_text
+                    vim.keymap.set('n', '<leader>sv', function()
+                      local vt = vim.diagnostic.config().virtual_text
+                      if vt then
+                        saved_virtual_text = vt
+                        vim.diagnostic.config({ virtual_text = false })
+                      else
+                        vim.diagnostic.config({ virtual_text = saved_virtual_text or true })
+                      end
+                      vim.notify("Diagnostic messages " .. (vt and "off" or "on"))
+                    end, { silent = true, desc = "Toggle diagnostic messages (keep signs)" })
                     vim.keymap.set('n', ']d', function() vim.diagnostic.goto_next() ; vim.schedule(function() vim.diagnostic.open_float() end) end, opts)
                     vim.keymap.set('n', '[d', function() vim.diagnostic.goto_prev() ; vim.schedule(function() vim.diagnostic.open_float() end) end, opts)
                   EOF
