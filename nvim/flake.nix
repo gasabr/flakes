@@ -447,6 +447,11 @@
                       end
                       vim.cmd('normal! zX')
                     end, { silent = true, desc = "Toggle hiding comment lines" })
+                    vim.keymap.set('n', '<leader>sd', function()
+                      local on = not vim.diagnostic.is_enabled()
+                      vim.diagnostic.enable(on)
+                      vim.notify("Diagnostics " .. (on and "on" or "off"))
+                    end, { silent = true, desc = "Toggle diagnostics" })
                     vim.keymap.set('n', ']d', function() vim.diagnostic.goto_next() ; vim.schedule(function() vim.diagnostic.open_float() end) end, opts)
                     vim.keymap.set('n', '[d', function() vim.diagnostic.goto_prev() ; vim.schedule(function() vim.diagnostic.open_float() end) end, opts)
                   EOF

@@ -13,6 +13,13 @@ This flake’s Darwin build calls that toolchain path directly and does not wrap
 nixpkgs `sourcekit-lsp` onto PATH. Xcode apps still need `buildServer.json`
 ([xcode-build-server](https://github.com/SolaWing/xcode-build-server)).
 
+## Diagnostics
+
+| Keys          | Description                                                        |
+| ------------- | ------------------------------------------------------------------ |
+| `<leader>sd`  | Toggle diagnostics (inline text, signs, underlines) on/off globally |
+| `]d` / `[d`   | Jump to next / previous diagnostic and show it in a float          |
+
 ## Git blame (IDEA-style)
 
 | Command     | Description                                                                 |
