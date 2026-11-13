@@ -2,11 +2,11 @@
   "nodes": {
     "nixpkgs": {
       "locked": {
-        "lastModified": 1793976852,
-        "narHash": "sha256-bWDN3JZcE9ovYoaD0/6WYbMtXYpUu0vd5onpK0pc/SE=",
+        "lastModified": 1794217284,
+        "narHash": "sha256-Ya0ojDh1BF5zgyZRlehygC0ZvvEg2WaGZWn1xiNozmM=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "57f1c8965649ce5bcac5118a0d2e41f1fbdc56e5",
+        "rev": "f4244ef33645badc8157562b5e80748929b396c2",
         "type": "github"
       },
       "original": {
@@ -18,11 +18,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1793977579,
-        "narHash": "sha256-WrSODdZFVIs/Hh2NzC0bY+ROByi0bATg8WfePX8dPj8=",
+        "lastModified": 1794495034,
+        "narHash": "sha256-E0hYoioqUtM2XmPPvYYpJgdADF5AW9oOoPSEiM9dTHQ=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "4fe25e12eb9f4c744966dd3de5a05246cf098601",
+        "rev": "2074cc672349f14240fb7ea90d509e0b643e9dd4",
         "type": "github"
       },
       "original": {
@@ -101,8 +101,8 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1794363491,
-        "narHash": "sha256-F8AlcmNvE5WIILS5M4TR35MPyfpoQH9WIqtDFRqcOlk=",
+        "lastModified": 1794524794,
+        "narHash": "sha256-GSyP+jqa+3N0qmBTTQcXDXk4fhY44tuk2MyBeFGUn6E=",
         "path": "/Users/Gleb.Abroskin/Projects/flakes/nvim",
         "type": "path"
       },
@@ -141,7 +141,7 @@
         "nixpkgs-unstable": "nixpkgs-unstable"
       },
       "locked": {
-        "lastModified": 1793647490,
+        "lastModified": 1794415847,
         "narHash": "sha256-0nSKzc8Up7729aeAp/aK3PG6aoYDhw/wll1Sioby6sI=",
         "path": "/Users/Gleb.Abroskin/Projects/flakes/cli-tools",
         "type": "path"

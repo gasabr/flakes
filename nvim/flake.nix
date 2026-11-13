@@ -246,6 +246,13 @@
                     local ok_gs, gitsigns = pcall(require, 'gitsigns')
                     if ok_gs then
                       gitsigns.setup()
+                      -- ]c / [c: jump across uncommitted hunks (staged + unstaged); keep native behaviour in diff mode
+                      vim.keymap.set('n', ']c', function()
+                        if vim.wo.diff then vim.cmd.normal({ ']c', bang = true }) else gitsigns.nav_hunk('next', { target = 'all' }) end
+                      end, { desc = "Next uncommitted change" })
+                      vim.keymap.set('n', '[c', function()
+                        if vim.wo.diff then vim.cmd.normal({ '[c', bang = true }) else gitsigns.nav_hunk('prev', { target = 'all' }) end
+                      end, { desc = "Prev uncommitted change" })
                       vim.api.nvim_create_user_command('GitBlame', function()
                         for _, win in ipairs(vim.api.nvim_list_wins()) do
                           if vim.bo[vim.api.nvim_win_get_buf(win)].filetype == 'gitsigns-blame' then
