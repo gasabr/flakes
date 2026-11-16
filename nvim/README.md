@@ -32,6 +32,30 @@ Run `:GitBlame` once to open the blame panel on the left (it scrolls together
 with your code, like the IntelliJ IDEA annotate view). Run `:GitBlame` again to
 close it.
 
+## Branch review
+
+Review mode makes gitsigns compare every buffer against the branch's
+merge-base with a ref (default `origin/HEAD`, else `main`/`master`). Signs,
+`]c` / `[c` and hunk previews then cover everything the branch changed,
+uncommitted work included, while you edit the real files with LSP. The
+statusline shows `review:<ref>` while it is on.
+
+| Command / Keys            | Description                                                              |
+| ------------------------- | ------------------------------------------------------------------------ |
+| `:Review [ref]`           | Start review vs merge-base with `ref` (tab-completes branches)           |
+| `:Review off`             | Back to normal (uncommitted-only) signs                                  |
+| `<leader>rr`              | Toggle review mode vs the default branch                                 |
+| `<leader>rf`              | Telescope: files changed in the branch (status + diff preview); opens at first hunk, deleted files open the old version |
+| `]c` / `[c`               | Next / previous change                                                   |
+| `<leader>rp`              | Show the previous version of the hunk inline                             |
+| `<leader>rd`              | Toggle a left split with the previous version of the file (diff mode)    |
+| `<leader>rt`              | Toggle diffview: file tree + side-by-side; right side is the real file (`--imply-local`), so LSP works. `q` closes |
+| `<leader>rh`              | Diffview history of the current file                                     |
+| `:ReviewWorktree <x>`     | Check out branch/commit `x` (or PR number `123`) into a sibling `<repo>-review-<x>` worktree, open it in a new tab and start review |
+
+Note: the review base is global to gitsigns, so it applies to all tabs. Remove
+review worktrees with `git worktree remove <dir>`.
+
 ## Window resizing
 
 Neovim's built-in window commands (prefix `<C-w>` = Ctrl+w):

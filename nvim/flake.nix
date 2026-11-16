@@ -22,7 +22,7 @@
                     autocmd FileType python setlocal foldmethod=indent foldlevel=99
                     autocmd FileType json,jsonc setlocal foldenable foldmethod=expr foldexpr=v:lua.vim.treesitter.foldexpr() foldlevel=99 | lua pcall(vim.treesitter.start, 0, 'json')
                     autocmd FileType swift setlocal tabstop=4 shiftwidth=4
-                    let g:airline_section_b = '%{FugitiveHead()}%{empty(get(g:, "gh_pr_status", "")) ? "" : " " . g:gh_pr_status}'
+                    let g:airline_section_b = '%{FugitiveHead()}%{empty(get(g:, "gh_pr_status", "")) ? "" : " " . g:gh_pr_status}%{empty(get(g:, "review_ref", "")) ? "" : " review:" . g:review_ref}'
                     let g:airline_section_c = ""
                     let g:airline_section_x = '%t'
                     let g:airline_section_y = '%{tagbar#currenttag("%s", "", "f")}'
@@ -365,6 +365,134 @@
                     vim.api.nvim_create_autocmd("FocusGained", { callback = function()
                       local b = vim.fn.FugitiveHead() ; if b ~= "" then _gh_pr_cache[b] = nil end ; _refresh_gh_pr()
                     end })
+                    -- Review mode: gitsigns diffs every buffer against merge-base(<ref>, HEAD), so signs, ]c/[c and
+                    -- hunk previews cover the whole branch while you edit the real files (LSP intact).
+                    local ok_dv, diffview = pcall(require, 'diffview')
+                    if ok_dv then
+                      local close = { 'n', 'q', '<cmd>DiffviewClose<CR>', { desc = "Close diffview" } }
+                      diffview.setup({ use_icons = false, keymaps = { view = { close }, file_panel = { close }, file_history_panel = { close } } })
+                    end
+                    if ok_gs then
+                      local function git(args) local out = vim.fn.systemlist(vim.list_extend({ "git" }, args)) ; return vim.v.shell_error == 0 and out or nil end
+                      local function default_ref()
+                        local r = git({ "symbolic-ref", "--quiet", "--short", "refs/remotes/origin/HEAD" })
+                        if r and r[1] then return r[1] end
+                        for _, b in ipairs({ "origin/main", "origin/master", "main", "master" }) do
+                          if git({ "rev-parse", "--verify", "--quiet", b }) then return b end
+                        end
+                      end
+                      local function review_stop()
+                        vim.g.review_ref = nil ; vim.g.review_base = nil
+                        gitsigns.reset_base(true) ; vim.cmd('redrawstatus!') ; vim.notify("Review mode off")
+                      end
+                      local function review_start(ref)
+                        ref = (ref and ref ~= "") and ref or default_ref()
+                        if not ref then vim.notify("Review: no base ref found", vim.log.levels.ERROR) ; return false end
+                        local mb = git({ "merge-base", ref, "HEAD" })
+                        if not (mb and mb[1]) then vim.notify("Review: no merge-base with " .. ref, vim.log.levels.ERROR) ; return false end
+                        vim.g.review_ref = ref ; vim.g.review_base = mb[1]
+                        gitsigns.change_base(mb[1], true) ; vim.cmd('redrawstatus!')
+                        vim.notify("Reviewing against " .. ref .. " (" .. mb[1]:sub(1, 8) .. ")")
+                        return true
+                      end
+                      vim.api.nvim_create_user_command('Review', function(o)
+                        if o.args == "off" then review_stop() else review_start(o.args) end
+                      end, { nargs = '?', desc = "Review branch vs merge-base with [ref] (default origin/HEAD); 'off' to stop",
+                        complete = function() return vim.list_extend({ "off" }, git({ "for-each-ref", "--format=%(refname:short)", "refs/heads", "refs/remotes" }) or {}) end })
+                      -- Jump to the first hunk once gitsigns has attached to the freshly opened buffer.
+                      local function jump_first_hunk(buf, tries)
+                        tries = tries or 0
+                        if not vim.api.nvim_buf_is_valid(buf) then return end
+                        local hunks = gitsigns.get_hunks(buf)
+                        local win = vim.fn.bufwinid(buf)
+                        if hunks and #hunks > 0 and win ~= -1 then
+                          vim.api.nvim_win_set_cursor(win, { math.max(hunks[1].added.start, 1), 0 })
+                          vim.api.nvim_win_call(win, function() vim.cmd('normal! zz') end)
+                        elseif tries < 20 then
+                          vim.defer_fn(function() jump_first_hunk(buf, tries + 1) end, 100)
+                        end
+                      end
+                      local function review_files()
+                        local base = vim.g.review_base
+                        if not base then vim.notify("Not in review mode: run :Review", vim.log.levels.WARN) ; return end
+                        local root = (git({ "rev-parse", "--show-toplevel" }) or {})[1]
+                        if not root then return end
+                        local items = {}
+                        for _, l in ipairs(git({ "-C", root, "diff", "--name-status", base }) or {}) do
+                          local parts = vim.split(l, "\t")
+                          table.insert(items, { status = parts[1]:sub(1, 1), path = parts[#parts] })
+                        end
+                        for _, p in ipairs(git({ "-C", root, "ls-files", "--others", "--exclude-standard" }) or {}) do
+                          table.insert(items, { status = "?", path = p })
+                        end
+                        local pickers, finders, previewers = require('telescope.pickers'), require('telescope.finders'), require('telescope.previewers')
+                        local putils, conf = require('telescope.previewers.utils'), require('telescope.config').values
+                        local actions, action_state = require('telescope.actions'), require('telescope.actions.state')
+                        local status_hl = { M = "diffChanged", A = "diffAdded", ["?"] = "diffAdded", D = "diffRemoved", R = "diffChanged" }
+                        pickers.new({}, {
+                          prompt_title = "Changed vs " .. vim.g.review_ref,
+                          finder = finders.new_table({ results = items, entry_maker = function(it)
+                            return { value = it, ordinal = it.path, path = root .. "/" .. it.path,
+                              display = function() return it.status .. "  " .. it.path, { { { 0, 1 }, status_hl[it.status] or "Comment" } } end }
+                          end }),
+                          sorter = conf.generic_sorter({}),
+                          previewer = previewers.new_buffer_previewer({ title = "Diff", define_preview = function(self, entry)
+                            local it = entry.value
+                            local cmd = it.status == "?" and { "git", "-C", root, "diff", "--no-index", "--", "/dev/null", it.path }
+                              or { "git", "-C", root, "diff", base, "--", it.path }
+                            putils.job_maker(cmd, self.state.bufnr, { value = it.path, bufname = self.state.bufname, cwd = root })
+                            putils.regex_highlighter(self.state.bufnr, "diff")
+                          end }),
+                          attach_mappings = function(prompt_buf)
+                            actions.select_default:replace(function()
+                              local e = action_state.get_selected_entry() ; actions.close(prompt_buf)
+                              if not e then return end
+                              if e.value.status == "D" then vim.cmd("Gedit " .. base .. ":" .. e.value.path) ; return end
+                              vim.cmd("edit " .. vim.fn.fnameescape(e.path))
+                              jump_first_hunk(vim.api.nvim_get_current_buf())
+                            end)
+                            return true
+                          end,
+                        }):find()
+                      end
+                      vim.api.nvim_create_user_command('ReviewWorktree', function(o)
+                        local target = o.args
+                        local root = (git({ "rev-parse", "--show-toplevel" }) or {})[1]
+                        if not root then vim.notify("Not in a git repo", vim.log.levels.ERROR) ; return end
+                        if target:match("^%d+$") then
+                          if not git({ "-C", root, "fetch", "origin", "pull/" .. target .. "/head:pr-" .. target }) then
+                            vim.notify("Could not fetch PR " .. target, vim.log.levels.ERROR) ; return
+                          end
+                          target = "pr-" .. target
+                        end
+                        local dir = vim.fn.fnamemodify(root, ':h') .. "/" .. vim.fn.fnamemodify(root, ':t') .. "-review-" .. target:gsub("[^%w%-_.]", "-")
+                        if vim.fn.isdirectory(dir) == 0 and not git({ "-C", root, "worktree", "add", "--detach", dir, target }) then
+                          vim.notify("git worktree add failed for " .. target, vim.log.levels.ERROR) ; return
+                        end
+                        vim.cmd('tabnew') ; vim.cmd('tcd ' .. vim.fn.fnameescape(dir))
+                        if review_start() then review_files() end
+                      end, { nargs = 1, desc = "Check out <branch|commit|PR#> in a sibling worktree, open it in a new tab, start review" })
+                      vim.keymap.set('n', '<leader>rr', function()
+                        if vim.g.review_base then review_stop() else review_start() end
+                      end, { silent = true, desc = "Toggle review mode vs default branch" })
+                      vim.keymap.set('n', '<leader>rf', review_files, { silent = true, desc = "Files changed in this branch" })
+                      vim.keymap.set('n', '<leader>rp', gitsigns.preview_hunk_inline, { silent = true, desc = "Show previous version of hunk inline" })
+                      vim.keymap.set('n', '<leader>rd', function()
+                        for _, w in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+                          if vim.api.nvim_buf_get_name(vim.api.nvim_win_get_buf(w)):match('^gitsigns://') then
+                            vim.api.nvim_win_close(w, true) ; vim.cmd('diffoff!') ; return
+                          end
+                        end
+                        gitsigns.diffthis(vim.g.review_base, { vertical = true, split = 'leftabove' })
+                      end, { silent = true, desc = "Toggle split with previous version of file" })
+                      if ok_dv then
+                        vim.keymap.set('n', '<leader>rt', function()
+                          if require('diffview.lib').get_current_view() then vim.cmd('DiffviewClose') ; return end
+                          if vim.g.review_ref then vim.cmd('DiffviewOpen ' .. vim.g.review_ref .. '...HEAD --imply-local') else vim.cmd('DiffviewOpen') end
+                        end, { silent = true, desc = "Toggle diffview tree of branch changes" })
+                        vim.keymap.set('n', '<leader>rh', '<cmd>DiffviewFileHistory %<CR>', { silent = true, desc = "History of current file" })
+                      end
+                    end
                     local opts = { noremap=true, silent=true }
                     vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
                     vim.keymap.set('n', 'gr', '<cmd>Telescope lsp_references<CR>', opts)
@@ -474,7 +602,7 @@
                   '';
                   packages.myVimPackage.start = with pkgs.vimPlugins; [
                     vim-elixir vim-nix vim-hybrid vim-airline vim-airline-themes vim-fugitive tagbar nvim-lspconfig nvim-cmp cmp-nvim-lsp cmp-buffer nerdtree nvim-autopairs telescope-nvim plenary-nvim telescope-fzf-native-nvim comment-nvim hop-nvim gitsigns-nvim nvim-treesitter-context
-                    nvim-nio conform-nvim
+                    nvim-nio conform-nvim diffview-nvim
                     (nvim-treesitter.withPlugins (p: [ p.html p.xml p.css p.javascript p.typescript p.tsx p.python p.nix p.yaml p.dockerfile p.json p.toml p.sql p.elixir p.heex p.eex p.go p.gomod p.gosum p.swift p.rust ]))
                   ];
                 };
