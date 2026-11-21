@@ -280,6 +280,7 @@
                         pickers = {
                           find_files = { hidden = true },
                           lsp_document_symbols = {
+                            ignore_symbols = { "variable", "constant" },
                             entry_maker = (function()
                               local make_entry = require('telescope.make_entry')
                               return function(entry)
